@@ -14,7 +14,7 @@ contract Storage is Ownable {
             "You have already register"
         );
         _players.push(msg.sender);
-        chosenBet(bet, msg.sender);
+        _betOn[msg.sender] = bet;
     }
 
     function depostBet(uint256 amount) external payable {
@@ -24,10 +24,6 @@ contract Storage is Ownable {
         );
         _betAmount[msg.sender] += amount;
         emit depositBet(msg.sender, amount);
-    }
-
-    function chosenBet(string memory bet, address player) private {
-        _betOn[player] = bet;
     }
 
     function getAmount() external view returns (uint256) {
@@ -40,11 +36,16 @@ contract Storage is Ownable {
         return choice;
     }
 
-    function empty() private {
+    function empty() internal {
         for (uint256 i = _players.length - 1; i >= 0; i--) {
             _betAmount[_players[i]] = 0;
             _betOn[_players[i]] = "";
             _players.pop();
         }
+    }
+
+    function withdraw() external onlyOwner {
+        address payable _owner = payable(owner());
+        _owner.transfer(address(this).balance);
     }
 }

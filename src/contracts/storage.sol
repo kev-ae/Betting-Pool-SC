@@ -2,9 +2,9 @@ pragma solidity >=0.5.0;
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract Storage is Ownable {
-    mapping(address => uint256) private _betAmount;
-    mapping(address => string) private _betOn;
-    address[] private _players;
+    mapping(address => uint256) internal _betAmount;
+    mapping(address => string) internal _betOn;
+    address[] internal _players;
 
     event depositBet(address indexed player, uint256 amount);
     event playerRegister(address indexed player, string bet);

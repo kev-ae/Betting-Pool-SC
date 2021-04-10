@@ -7,23 +7,33 @@ contract Storage is Ownable {
     address[] private _players;
 
     event depositBet(address indexed player, uint256 amount);
+    event playerRegister(address indexed player, string bet);
 
-    function register(string memory bet) external {
-        require(
-            bytes(_betOn[msg.sender]).length == 0,
-            "You have already register"
-        );
-        _players.push(msg.sender);
-        _betOn[msg.sender] = bet;
+    modifier isNotRegister() {
+        uint256 counter = 0;
+        for (uint256 i = 0; i < _players.length; i++) {
+            if (_players[i] != msg.sender) {
+                counter++;
+            }
+        }
+        require(counter == _players.length, "You have already register");
+        _;
     }
 
-    function depostBet(uint256 amount) external payable {
+    function register(string memory bet, uint256 deposit)
+        external
+        payable
+        isNotRegister
+    {
         require(
             msg.value >= 1 ether,
             "The minimum amount required to bet is 1 ether"
         );
-        _betAmount[msg.sender] += amount;
-        emit depositBet(msg.sender, amount);
+        _players.push(msg.sender);
+        _betOn[msg.sender] = bet;
+        _betAmount[msg.sender] = deposit;
+        emit playerRegister(msg.sender, bet);
+        emit depositBet(msg.sender, deposit);
     }
 
     function getAmount() external view returns (uint256) {
@@ -37,11 +47,7 @@ contract Storage is Ownable {
     }
 
     function empty() internal {
-        for (uint256 i = _players.length - 1; i >= 0; i--) {
-            _betAmount[_players[i]] = 0;
-            _betOn[_players[i]] = "";
-            _players.pop();
-        }
+        delete _players;
     }
 
     function withdraw() external onlyOwner {

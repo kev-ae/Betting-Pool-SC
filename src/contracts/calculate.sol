@@ -11,7 +11,7 @@ contract Calculate is Storage {
                 keccak256(abi.encodePacked(_options[0])) ||
                 keccak256(abi.encodePacked(bet)) ==
                 keccak256(abi.encodePacked(_options[1])),
-            "The bet choice is not valid"
+            "The input you have chosen is not one of the options"
         );
         _;
     }
@@ -31,6 +31,29 @@ contract Calculate is Storage {
         }
         _betChoices[_options[0]] = counter1;
         _betChoices[_options[1]] = counter2;
+    }
+
+    function _getPercentage() internal view returns (uint256, uint256) {
+        uint256 total = _betChoices[_options[0]] + _betChoices[_options[1]];
+        uint256 pcent1 = _betChoices[_options[0]] / total;
+        uint256 pcent2 = _betChoices[_options[1]] / total;
+        return (pcent1, pcent2);
+    }
+
+    function _divide(string memory loser) internal view returns (uint256) {
+        uint256 p1;
+        uint256 p2;
+        uint256 percent = 0;
+        (p1, p2) = _getPercentage();
+        if (
+            keccak256(abi.encodePacked(loser)) ==
+            keccak256(abi.encodePacked(_options[0]))
+        ) {
+            percent = p1 / _betChoices[_options[1]];
+        } else {
+            percent = p2 / _betChoices[_options[0]];
+        }
+        return percent;
     }
 
     function empty() internal {

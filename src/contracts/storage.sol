@@ -20,22 +20,6 @@ contract Storage is Ownable {
         _;
     }
 
-    function register(string memory bet, uint256 deposit)
-        external
-        payable
-        isNotRegister
-    {
-        require(
-            msg.value >= 1 ether,
-            "The minimum amount required to bet is 1 ether"
-        );
-        _players.push(msg.sender);
-        _betOn[msg.sender] = bet;
-        _betAmount[msg.sender] = deposit;
-        emit playerRegister(msg.sender, bet);
-        emit depositBet(msg.sender, deposit);
-    }
-
     function getAmount() external view returns (uint256) {
         uint256 amount = _betAmount[msg.sender];
         return amount;
@@ -44,10 +28,6 @@ contract Storage is Ownable {
     function getChoice() external view returns (string memory) {
         string memory choice = _betOn[msg.sender];
         return choice;
-    }
-
-    function empty() internal {
-        delete _players;
     }
 
     function withdraw() external onlyOwner {

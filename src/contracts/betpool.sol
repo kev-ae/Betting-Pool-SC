@@ -2,7 +2,14 @@ pragma solidity >=0.5.0;
 import "./calculate.sol";
 
 contract Betpool is Calculate {
-    function register(string memory bet, uint256 deposit)
+    event optionChange(string option1, string option2);
+
+    constructor(string memory opt1, string memory opt2) onlyOwner {
+        _setOptions(opt1, opt2);
+        emit optionChange(opt1, opt2);
+    }
+
+    function register(string memory bet)
         external
         payable
         isNotRegister
@@ -14,14 +21,15 @@ contract Betpool is Calculate {
         );
         _players.push(msg.sender);
         _betOn[msg.sender] = bet;
-        _betAmount[msg.sender] = deposit;
+        _betAmount[msg.sender] = msg.value;
         emit playerRegister(msg.sender, bet);
-        emit depositBet(msg.sender, deposit);
+        emit depositBet(msg.sender, msg.value);
     }
 
     function _setOptions(string memory opt1, string memory opt2) internal {
         _options.push(opt1);
         _options.push(opt2);
+        emit optionChange(opt1, opt2);
         _countDifference();
     }
 
